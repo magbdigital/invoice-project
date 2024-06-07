@@ -12,8 +12,8 @@ import jakarta.persistence.Table
 import java.util.*
 
 @Entity
-@Table(name = "invoice")
-class Invoice {
+@Table(name = "invoice_view")
+class InvoiceView {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     @Column(updatable = false)
@@ -23,7 +23,6 @@ class Invoice {
     var createAt: Date? = null
     var total: Double? = null
 
+    var fullname: String? = null
 
-    @Column(name="client_id")
-    var clientId: Long? = null
 }
