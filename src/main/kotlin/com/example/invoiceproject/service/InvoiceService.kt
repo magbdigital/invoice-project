@@ -22,11 +22,28 @@ class InvoiceService {
     @Autowired  //
     lateinit var invoiceViewRepository: InvoiceViewRepository
 
+    @Autowired
+    lateinit var clientRepository: ClientRepository
+
     fun list ():List<Invoice>{
         return invoiceRepository.findAll()
     }
     fun save (invoice: Invoice):Invoice{
-       // val invoices = invoiceRepository.findByClienteId(invoice.client.id)
+        /*
+        * Agregar una funcion a invoice repository
+        * Obtener el la lista de facturas del cliente con el id
+        * Obtener el limite de credito del cliente
+        * Obtener el total de las facturas
+        * */
+        val invoices = invoiceRepository.findByClientId(invoice.clientId)
+        val client = clientRepository.findById(invoice.clientId)
+        var total = 0.0
+        invoices.forEach {
+            total += it.total!!
+        }
+        if ((total+invoice.total!!) > client?.creditLimit!!){
+            throw Exception("El total de las facturas supera el limite de credito")
+        }
         return invoiceRepository.save(invoice)
     }
 

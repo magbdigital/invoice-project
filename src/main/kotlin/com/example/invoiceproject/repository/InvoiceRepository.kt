@@ -20,5 +20,5 @@ interface InvoiceRepository:JpaRepository<Invoice, Long?> {
   @Query(nativeQuery = true)
   fun getInvoiceReport (): List<Array<out Any>>
 
-  fun findByClientId(clientId:Long?):List<Invoice>
+  fun findByClientId(clientId: Long?): List<Invoice>
 }
