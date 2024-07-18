@@ -15,6 +15,13 @@ class ClientService {
     }
 
     fun save(client: Client):Client{
-        return clientRepository.save(client) // insert into ... JPaRepository
+          return clientRepository.save(client) // insert into ... JPaRepository
+    }
+
+
+    fun validateNui (nui:String?):Boolean?{
+
+
+        return null
     }
 }
