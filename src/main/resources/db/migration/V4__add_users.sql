@@ -14,6 +14,5 @@ CREATE TABLE IF NOT EXISTS role (
     id SERIAL,
     role VARCHAR(100) NOT NULL,
     user_id INT,
-    PRIMARY KEY (id),
-    UNIQUE (role)
+    PRIMARY KEY (id)
 );

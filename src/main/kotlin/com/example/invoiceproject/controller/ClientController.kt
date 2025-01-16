@@ -17,8 +17,8 @@ class ClientController {
     lateinit var clientService: ClientService
 
     @GetMapping//Esta anotacion relaciona este metodo con GET de HTTP
-    fun list(): List<Client> {
-        val list = clientService.list()
+    fun list(client:Client): List<Client> {
+        val list = clientService.list(client)
         return list
     }
     @PostMapping
