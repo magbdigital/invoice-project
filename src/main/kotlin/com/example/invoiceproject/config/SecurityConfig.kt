@@ -1,8 +1,10 @@
 package com.example.invoiceproject.config
 
+import com.example.invoiceproject.constants.Constants
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.http.HttpMethod
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.config.Customizer
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration
@@ -12,16 +14,16 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
-import org.springframework.http.HttpMethod
 
 @Configuration
 class SecurityConfig {
+
     @Autowired
-    private val jwtFilter: JwtFilter? = null
+    private val jwtUtils: JwtUtil? = null
 
     @Bean
     @Throws(Exception::class)
-    open fun filterChain(http: HttpSecurity): SecurityFilterChain? {
+    open fun filterChain(http: HttpSecurity, jwtUtil: JwtUtil): SecurityFilterChain? {
         http
             .csrf { csrf -> csrf.disable() }
             .cors(Customizer.withDefaults())
@@ -29,12 +31,14 @@ class SecurityConfig {
             .authorizeHttpRequests { authRequest ->
                 authRequest
                     .requestMatchers("/auth/**").permitAll()
-                    .requestMatchers("/client/**").hasAnyRole("admin","ventas")
-                    .requestMatchers(HttpMethod.GET,"/product/**").hasAnyRole("admin")
+                    .requestMatchers("/actuator/**").permitAll()
+                    .requestMatchers("/mqtt/**").permitAll()
+                    .requestMatchers("/client/**").permitAll()
+                    .requestMatchers("/**").hasRole(Constants.ROLE_ADMIN)
 
                     .anyRequest().denyAll()
             }
-            .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter::class.java)
+            .addFilterBefore(JwtFilter(jwtUtils!!) , UsernamePasswordAuthenticationFilter::class.java)
 
         return http.build()
 

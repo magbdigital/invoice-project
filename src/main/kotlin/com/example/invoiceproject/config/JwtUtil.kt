@@ -3,45 +3,52 @@ package com.example.invoiceproject.config
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
 import com.auth0.jwt.exceptions.JWTVerificationException
-import com.example.invoiceproject.repository.UserRepository
-import org.springframework.beans.factory.annotation.Autowired
+import com.auth0.jwt.interfaces.Claim
+import com.auth0.jwt.interfaces.DecodedJWT
+import org.springframework.security.core.Authentication
+import org.springframework.security.core.GrantedAuthority
 import org.springframework.stereotype.Component
-import java.util.Date
+import java.util.*
 import java.util.concurrent.TimeUnit
+import java.util.stream.Collectors
+
 
 @Component
 class JwtUtil {
-    @Autowired
-    lateinit var userRepository: UserRepository
-    private val SECRET_KEY = "s3cr37"
+
+    private val SECRET_KEY = "s3cr3t"
     private val ALGORITHM: Algorithm = Algorithm.HMAC256(SECRET_KEY)
 
-    fun create(username: String?): String? {
-        val userEntity = userRepository.findByUsername(username!!)
-        val roles: Array<String?> = userEntity?.roles?.map {
-                role -> role.role }!!.toTypedArray()
+    fun create(authentication: Authentication): String? {
+
+        val authorities = authentication.authorities
+            .stream()
+            .map { obj: GrantedAuthority -> obj.authority }
+            .collect(Collectors.joining(","))
         return JWT.create()
-            .withArrayClaim("roles", roles)
-            .withSubject(username)
-            .withIssuer("app-admin")
+            .withClaim("authorities", authorities)
+            .withSubject(authentication.principal.toString() )
+            .withIssuer("project-admin")
             .withIssuedAt(Date())
             .withExpiresAt(Date(System.currentTimeMillis() + TimeUnit.DAYS.toMillis(15)))
             .sign(ALGORITHM)
     }
-    fun isValid(jwt: String?): Boolean {
-        return try {
-            JWT.require(ALGORITHM)
+
+    fun validateToken(token: String?): DecodedJWT {
+            val algorithm: Algorithm = Algorithm.HMAC256(SECRET_KEY)
+            val verifier = JWT.require(algorithm)
+                .withIssuer("project-admin")
                 .build()
-                .verify(jwt)
-            true
-        } catch (e: JWTVerificationException) {
-            false
-        }
+            val decodedJWT: DecodedJWT = verifier.verify(token)
+                ?: throw JWTVerificationException("Token invalid, not Authorized j")
+            return decodedJWT
     }
-    fun getUsername(jwt: String?): String? {
-        return JWT.require(ALGORITHM)
-            .build()
-            .verify(jwt)
-            .subject
+
+    fun extractUsername(decodedJWT: DecodedJWT): String {
+        return decodedJWT.subject.toString()
+    }
+
+    fun getSpecificClaim(decodedJWT: DecodedJWT, claimName: String?): Claim {
+        return decodedJWT.getClaim(claimName)
     }
 }

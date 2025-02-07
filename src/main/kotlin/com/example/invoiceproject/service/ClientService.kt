@@ -17,15 +17,13 @@ class ClientService {
             .withIgnoreNullValues()
             // Filtro por fullname, agrega la siguiente linea para filtrar por otro campo
             .withMatcher(("fullname"), ExampleMatcher.GenericPropertyMatchers.contains().ignoreCase())
+            .withMatcher(("nui"), ExampleMatcher.GenericPropertyMatchers.contains().ignoreCase())
         val example = Example.of(client, matcher)
         val pageResponse = clientRepository.findAll(example)
         return pageResponse
     }
 
     fun save(client: Client):Client{
-        val matcher = ExampleMatcher.matching()
-            .withIgnoreNullValues()
-            .withMatcher(("description"), ExampleMatcher.GenericPropertyMatchers.contains().ignoreCase())
           return clientRepository.save(client) // insert into ... JPaRepository
     }
 

@@ -5,9 +5,11 @@ import com.example.invoiceproject.repository.InvoiceRepository
 import com.example.invoiceproject.service.ClientService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.ModelAttribute
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
@@ -17,7 +19,7 @@ class ClientController {
     lateinit var clientService: ClientService
 
     @GetMapping//Esta anotacion relaciona este metodo con GET de HTTP
-    fun list(client:Client): List<Client> {
+    fun list(@ModelAttribute client:Client): List<Client> {
         val list = clientService.list(client)
         return list
     }
